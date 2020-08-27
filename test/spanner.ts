@@ -853,7 +853,10 @@ describe('Spanner with mock server', () => {
 
   describe('queryOptions', () => {
     /** Common verify method for QueryOptions tests. */
-    function verifyQueryOptions(optimizerVersion: string) {
+    function verifyQueryOptions(
+      optimizerVersion: string,
+      optimizerStatisticsPackage: string
+    ) {
       const request = spannerMock.getRequests().find(val => {
         return (val as v1.ExecuteSqlRequest).sql;
       }) as v1.ExecuteSqlRequest;
@@ -866,20 +869,28 @@ describe('Spanner with mock server', () => {
         request.queryOptions!.optimizerVersion,
         optimizerVersion
       );
+      assert.strictEqual(
+        request.queryOptions!.optimizerStatisticsPackage,
+        optimizerStatisticsPackage
+      );
     }
 
     describe('on request', () => {
+      const OPTIMIZER_VERSION = '100';
+      const OPTIMIZER_STATISTICS_PACKAGE = 'auto_20191128_14_47_22UTC';
+
       it('database.run', async () => {
         const query = {
           sql: selectSql,
           queryOptions: QueryOptions.create({
-            optimizerVersion: '100',
+            optimizerVersion: OPTIMIZER_VERSION,
+            optimizerStatisticsPackage: OPTIMIZER_STATISTICS_PACKAGE,
           }),
         } as ExecuteSqlRequest;
         const database = newTestDatabase();
         try {
           await database.run(query);
-          verifyQueryOptions('100');
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
         } finally {
           await database.close();
         }
@@ -889,14 +900,15 @@ describe('Spanner with mock server', () => {
         const query = {
           sql: selectSql,
           queryOptions: QueryOptions.create({
-            optimizerVersion: '100',
+            optimizerVersion: OPTIMIZER_VERSION,
+            optimizerStatisticsPackage: OPTIMIZER_STATISTICS_PACKAGE,
           }),
         } as ExecuteSqlRequest;
         const database = newTestDatabase();
         try {
           const [snapshot] = await database.getSnapshot();
           await snapshot.run(query);
-          verifyQueryOptions('100');
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await snapshot.end();
         } finally {
           await database.close();
@@ -907,14 +919,15 @@ describe('Spanner with mock server', () => {
         const query = {
           sql: selectSql,
           queryOptions: QueryOptions.create({
-            optimizerVersion: '100',
+            optimizerVersion: OPTIMIZER_VERSION,
+            optimizerStatisticsPackage: OPTIMIZER_STATISTICS_PACKAGE,
           }),
         } as ExecuteSqlRequest;
         const database = newTestDatabase();
         database.runTransaction(async (err, transaction) => {
           assert.ifError(err);
           await transaction!.run(query);
-          verifyQueryOptions('100');
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await transaction!.commit();
           await database.close();
           done();
@@ -925,14 +938,15 @@ describe('Spanner with mock server', () => {
         const query = {
           sql: selectSql,
           queryOptions: QueryOptions.create({
-            optimizerVersion: '100',
+            optimizerVersion: OPTIMIZER_VERSION,
+            optimizerStatisticsPackage: OPTIMIZER_STATISTICS_PACKAGE,
           }),
         } as ExecuteSqlRequest;
         const database = newTestDatabase();
         try {
           await database.runTransactionAsync(async transaction => {
             await transaction.run(query);
-            verifyQueryOptions('100');
+            verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
             await transaction.commit();
           });
         } finally {
@@ -943,6 +957,8 @@ describe('Spanner with mock server', () => {
 
     describe('with environment variable', () => {
       const OPTIMIZER_VERSION = '20';
+      const OPTIMIZER_STATISTICS_PACKAGE = 'auto_20191128_14_47_22UTC';
+
       let spannerWithEnvVar: Spanner;
       let instanceWithEnvVar: Instance;
 
@@ -959,6 +975,7 @@ describe('Spanner with mock server', () => {
 
       before(() => {
         process.env.SPANNER_OPTIMIZER_VERSION = OPTIMIZER_VERSION;
+        process.env.SPANNER_OPTIMIZER_STATISTICS_PACKAGE = OPTIMIZER_STATISTICS_PACKAGE;
         spannerWithEnvVar = new Spanner({
           projectId: 'fake-project-id',
           servicePath: 'localhost',
@@ -971,13 +988,14 @@ describe('Spanner with mock server', () => {
 
       after(() => {
         delete process.env.SPANNER_OPTIMIZER_VERSION;
+        delete process.env.SPANNER_OPTIMIZER_STATISTICS_PACKAGE;
       });
 
       it('database.run', async () => {
         const database = newTestDatabase();
         try {
           await database.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
         } finally {
           await database.close();
         }
@@ -988,10 +1006,11 @@ describe('Spanner with mock server', () => {
         // as they are overridden by the environment variable.
         const database = newTestDatabase(undefined, {
           optimizerVersion: 'version-in-db-opts',
+          optimizerStatisticsPackage: 'stats-package-in-db-opts',
         });
         try {
           await database.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
         } finally {
           await database.close();
         }
@@ -1004,9 +1023,10 @@ describe('Spanner with mock server', () => {
             sql: selectSql,
             queryOptions: {
               optimizerVersion: 'version-on-query',
+              optimizerStatisticsPackage: 'stats-package-on-query',
             },
           });
-          verifyQueryOptions('version-on-query');
+          verifyQueryOptions('version-on-query', 'stats-package-on-query');
         } finally {
           await database.close();
         }
@@ -1017,7 +1037,7 @@ describe('Spanner with mock server', () => {
         try {
           const [snapshot] = await database.getSnapshot();
           await snapshot.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await snapshot.end();
         } finally {
           await database.close();
@@ -1032,9 +1052,10 @@ describe('Spanner with mock server', () => {
             sql: selectSql,
             queryOptions: {
               optimizerVersion: 'version-on-query',
+              optimizerStatisticsPackage: 'stats-package-on-query',
             },
           });
-          verifyQueryOptions('version-on-query');
+          verifyQueryOptions('version-on-query', 'stats-package-on-query');
           await snapshot.end();
         } finally {
           await database.close();
@@ -1044,11 +1065,12 @@ describe('Spanner with mock server', () => {
       it('snapshot.run with database-with-query-options', async () => {
         const database = newTestDatabase(undefined, {
           optimizerVersion: 'version-in-db-opts',
+          optimizerStatisticsPackage: 'stats-package-in-db-opts',
         });
         try {
           const [snapshot] = await database.getSnapshot();
           await snapshot.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await snapshot.end();
         } finally {
           await database.close();
@@ -1060,7 +1082,7 @@ describe('Spanner with mock server', () => {
         database.runTransaction(async (err, transaction) => {
           assert.ifError(err);
           await transaction!.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await transaction!.commit();
           await database.close();
           done();
@@ -1075,9 +1097,10 @@ describe('Spanner with mock server', () => {
             sql: selectSql,
             queryOptions: {
               optimizerVersion: 'version-on-query',
+              optimizerStatisticsPackage: 'stats-package-on-query',
             },
           });
-          verifyQueryOptions('version-on-query');
+          verifyQueryOptions('version-on-query', 'stats-package-on-query');
           await transaction!.commit();
           await database.close();
           done();
@@ -1087,11 +1110,12 @@ describe('Spanner with mock server', () => {
       it('transaction.run with database-with-query-options', done => {
         const database = newTestDatabase(undefined, {
           optimizerVersion: 'version-in-db-opts',
+          optimizerStatisticsPackage: 'stats-package-in-db-opts',
         });
         database.runTransaction(async (err, transaction) => {
           assert.ifError(err);
           await transaction!.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await transaction!.commit();
           await database.close();
           done();
@@ -1103,7 +1127,7 @@ describe('Spanner with mock server', () => {
         try {
           await database.runTransactionAsync(async transaction => {
             await transaction.run(selectSql);
-            verifyQueryOptions(OPTIMIZER_VERSION);
+            verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
             await transaction.commit();
           });
         } finally {
@@ -1119,9 +1143,10 @@ describe('Spanner with mock server', () => {
               sql: selectSql,
               queryOptions: {
                 optimizerVersion: 'version-on-query',
+                optimizerStatisticsPackage: 'stats-package-on-query',
               },
             });
-            verifyQueryOptions('version-on-query');
+            verifyQueryOptions('version-on-query', 'stats-package-on-query');
             await transaction.commit();
           });
         } finally {
@@ -1132,11 +1157,12 @@ describe('Spanner with mock server', () => {
       it('async transaction.run with database-with-query-options', async () => {
         const database = newTestDatabase(undefined, {
           optimizerVersion: 'version-in-db-opts',
+          optimizerStatisticsPackage: 'stats-package-in-db-opts',
         });
         try {
           await database.runTransactionAsync(async transaction => {
             await transaction.run(selectSql);
-            verifyQueryOptions(OPTIMIZER_VERSION);
+            verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
             await transaction.commit();
           });
         } finally {
@@ -1147,11 +1173,13 @@ describe('Spanner with mock server', () => {
 
     describe('on database options', () => {
       const OPTIMIZER_VERSION = '40';
+      const OPTIMIZER_STATISTICS_PACKAGE = 'auto_20191128_14_47_22UTC';
 
       // Request a database with default query options.
       function newTestDatabase(options?: SessionPoolOptions): Database {
         return instance.database(`database-${dbCounter++}`, options, {
           optimizerVersion: OPTIMIZER_VERSION,
+          optimizerStatisticsPackage: OPTIMIZER_STATISTICS_PACKAGE,
         } as IQueryOptions);
       }
 
@@ -1159,7 +1187,7 @@ describe('Spanner with mock server', () => {
         const database = newTestDatabase();
         try {
           await database.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
         } finally {
           await database.close();
         }
@@ -1170,7 +1198,7 @@ describe('Spanner with mock server', () => {
         try {
           const [snapshot] = await database.getSnapshot();
           await snapshot.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await snapshot.end();
         } finally {
           await database.close();
@@ -1182,7 +1210,7 @@ describe('Spanner with mock server', () => {
         database.runTransaction(async (err, transaction) => {
           assert.ifError(err);
           await transaction!.run(selectSql);
-          verifyQueryOptions(OPTIMIZER_VERSION);
+          verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
           await transaction!.commit();
           await database.close();
           done();
@@ -1194,7 +1222,7 @@ describe('Spanner with mock server', () => {
         try {
           await database.runTransactionAsync(async transaction => {
             await transaction.run(selectSql);
-            verifyQueryOptions(OPTIMIZER_VERSION);
+            verifyQueryOptions(OPTIMIZER_VERSION, OPTIMIZER_STATISTICS_PACKAGE);
             await transaction.commit();
           });
         } finally {
