@@ -3103,6 +3103,18 @@
                     }
                   }
                 },
+                "RequestOptions": {
+                  "fields": {
+                    "requestTag": {
+                      "type": "string",
+                      "id": 2
+                    },
+                    "transactionTag": {
+                      "type": "string",
+                      "id": 3
+                    }
+                  }
+                },
                 "ExecuteSqlRequest": {
                   "fields": {
                     "session": {
@@ -3152,6 +3164,10 @@
                     "queryOptions": {
                       "type": "QueryOptions",
                       "id": 10
+                    },
+                    "requestOptions": {
+                      "type": "RequestOptions",
+                      "id": 11
                     }
                   },
                   "nested": {
@@ -3203,6 +3219,10 @@
                       "options": {
                         "(google.api.field_behavior)": "REQUIRED"
                       }
+                    },
+                    "requestOptions": {
+                      "type": "RequestOptions",
+                      "id": 5
                     }
                   },
                   "nested": {
@@ -3401,6 +3421,10 @@
                     "partitionToken": {
                       "type": "bytes",
                       "id": 10
+                    },
+                    "requestOptions": {
+                      "type": "RequestOptions",
+                      "id": 11
                     }
                   }
                 },
@@ -3420,6 +3444,10 @@
                       "options": {
                         "(google.api.field_behavior)": "REQUIRED"
                       }
+                    },
+                    "requestOptions": {
+                      "type": "RequestOptions",
+                      "id": 3
                     }
                   }
                 },
@@ -3453,6 +3481,10 @@
                       "rule": "repeated",
                       "type": "Mutation",
                       "id": 4
+                    },
+                    "requestOptions": {
+                      "type": "RequestOptions",
+                      "id": 6
                     }
                   }
                 },

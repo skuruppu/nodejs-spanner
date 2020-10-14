@@ -13509,6 +13509,102 @@ export namespace google {
                 public toJSON(): { [k: string]: any };
             }
 
+            /** Properties of a RequestOptions. */
+            interface IRequestOptions {
+
+                /** RequestOptions requestTag */
+                requestTag?: (string|null);
+
+                /** RequestOptions transactionTag */
+                transactionTag?: (string|null);
+            }
+
+            /** Represents a RequestOptions. */
+            class RequestOptions implements IRequestOptions {
+
+                /**
+                 * Constructs a new RequestOptions.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: google.spanner.v1.IRequestOptions);
+
+                /** RequestOptions requestTag. */
+                public requestTag: string;
+
+                /** RequestOptions transactionTag. */
+                public transactionTag: string;
+
+                /**
+                 * Creates a new RequestOptions instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns RequestOptions instance
+                 */
+                public static create(properties?: google.spanner.v1.IRequestOptions): google.spanner.v1.RequestOptions;
+
+                /**
+                 * Encodes the specified RequestOptions message. Does not implicitly {@link google.spanner.v1.RequestOptions.verify|verify} messages.
+                 * @param message RequestOptions message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: google.spanner.v1.IRequestOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified RequestOptions message, length delimited. Does not implicitly {@link google.spanner.v1.RequestOptions.verify|verify} messages.
+                 * @param message RequestOptions message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: google.spanner.v1.IRequestOptions, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a RequestOptions message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns RequestOptions
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.spanner.v1.RequestOptions;
+
+                /**
+                 * Decodes a RequestOptions message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns RequestOptions
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.spanner.v1.RequestOptions;
+
+                /**
+                 * Verifies a RequestOptions message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a RequestOptions message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns RequestOptions
+                 */
+                public static fromObject(object: { [k: string]: any }): google.spanner.v1.RequestOptions;
+
+                /**
+                 * Creates a plain object from a RequestOptions message. Also converts values to other types if specified.
+                 * @param message RequestOptions
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: google.spanner.v1.RequestOptions, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this RequestOptions to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+
             /** Properties of an ExecuteSqlRequest. */
             interface IExecuteSqlRequest {
 
@@ -13541,6 +13637,9 @@ export namespace google {
 
                 /** ExecuteSqlRequest queryOptions */
                 queryOptions?: (google.spanner.v1.ExecuteSqlRequest.IQueryOptions|null);
+
+                /** ExecuteSqlRequest requestOptions */
+                requestOptions?: (google.spanner.v1.IRequestOptions|null);
             }
 
             /** Represents an ExecuteSqlRequest. */
@@ -13581,6 +13680,9 @@ export namespace google {
 
                 /** ExecuteSqlRequest queryOptions. */
                 public queryOptions?: (google.spanner.v1.ExecuteSqlRequest.IQueryOptions|null);
+
+                /** ExecuteSqlRequest requestOptions. */
+                public requestOptions?: (google.spanner.v1.IRequestOptions|null);
 
                 /**
                  * Creates a new ExecuteSqlRequest instance using the specified properties.
@@ -13767,6 +13869,9 @@ export namespace google {
 
                 /** ExecuteBatchDmlRequest seqno */
                 seqno?: (number|Long|string|null);
+
+                /** ExecuteBatchDmlRequest requestOptions */
+                requestOptions?: (google.spanner.v1.IRequestOptions|null);
             }
 
             /** Represents an ExecuteBatchDmlRequest. */
@@ -13789,6 +13894,9 @@ export namespace google {
 
                 /** ExecuteBatchDmlRequest seqno. */
                 public seqno: (number|Long|string);
+
+                /** ExecuteBatchDmlRequest requestOptions. */
+                public requestOptions?: (google.spanner.v1.IRequestOptions|null);
 
                 /**
                  * Creates a new ExecuteBatchDmlRequest instance using the specified properties.
@@ -14619,6 +14727,9 @@ export namespace google {
 
                 /** ReadRequest partitionToken */
                 partitionToken?: (Uint8Array|string|null);
+
+                /** ReadRequest requestOptions */
+                requestOptions?: (google.spanner.v1.IRequestOptions|null);
             }
 
             /** Represents a ReadRequest. */
@@ -14656,6 +14767,9 @@ export namespace google {
 
                 /** ReadRequest partitionToken. */
                 public partitionToken: (Uint8Array|string);
+
+                /** ReadRequest requestOptions. */
+                public requestOptions?: (google.spanner.v1.IRequestOptions|null);
 
                 /**
                  * Creates a new ReadRequest instance using the specified properties.
@@ -14736,6 +14850,9 @@ export namespace google {
 
                 /** BeginTransactionRequest options */
                 options?: (google.spanner.v1.ITransactionOptions|null);
+
+                /** BeginTransactionRequest requestOptions */
+                requestOptions?: (google.spanner.v1.IRequestOptions|null);
             }
 
             /** Represents a BeginTransactionRequest. */
@@ -14752,6 +14869,9 @@ export namespace google {
 
                 /** BeginTransactionRequest options. */
                 public options?: (google.spanner.v1.ITransactionOptions|null);
+
+                /** BeginTransactionRequest requestOptions. */
+                public requestOptions?: (google.spanner.v1.IRequestOptions|null);
 
                 /**
                  * Creates a new BeginTransactionRequest instance using the specified properties.
@@ -14838,6 +14958,9 @@ export namespace google {
 
                 /** CommitRequest mutations */
                 mutations?: (google.spanner.v1.IMutation[]|null);
+
+                /** CommitRequest requestOptions */
+                requestOptions?: (google.spanner.v1.IRequestOptions|null);
             }
 
             /** Represents a CommitRequest. */
@@ -14860,6 +14983,9 @@ export namespace google {
 
                 /** CommitRequest mutations. */
                 public mutations: google.spanner.v1.IMutation[];
+
+                /** CommitRequest requestOptions. */
+                public requestOptions?: (google.spanner.v1.IRequestOptions|null);
 
                 /** CommitRequest transaction. */
                 public transaction?: ("transactionId"|"singleUseTransaction");
