@@ -941,31 +941,7 @@ describe('Spanner', () => {
         `Created database ${VERSION_RETENTION_DATABASE_ID} with version retention period.`
       )
     );
-  });
-
-  // get_database_ddl
-  it('should get a database schema with a retention period set', async () => {
-    const output = execSync(
-      `${schemaCmd} getDatabaseSchemaWithVersionRetentionPeriod "${INSTANCE_ID}" "${VERSION_RETENTION_DATABASE_ID}" ${PROJECT_ID}`
-    );
-    assert.include(output, "version_retention_period = '1d'");
-  });
-
-  // update_version_retention_period
-  it('should update version retention period on database', async () => {
-    const output = execSync(
-      `${schemaCmd} updateDatabaseWithVersionRetentionPeriod "${INSTANCE_ID}" "${VERSION_RETENTION_DATABASE_ID}" ${PROJECT_ID}`
-    );
-    assert.include(output, 'Waiting for operation to complete...');
-    assert.include(output, 'Updated the version retention period.');
-  });
-
-  // get_database
-  it('should get a database with a retention period set', async () => {
-    const output = execSync(
-      `${schemaCmd} getDatabaseWithVersionRetentionPeriod "${INSTANCE_ID}" "${VERSION_RETENTION_DATABASE_ID}" ${PROJECT_ID}`
-    );
-    assert.include(output, 'Version retention period: 2d');
+    assert.include(output, 'Version retention period: 1d');
     assert.include(output, 'Earliest version time:');
   });
 });
