@@ -557,6 +557,7 @@ describe('Spanner', () => {
             name: PATH,
             displayName: NAME,
             nodeCount: 1,
+            processingUnits: undefined,
             config: `projects/project-id/instanceConfigs/${CONFIG.config}`,
           },
         });
