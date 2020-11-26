@@ -51,6 +51,7 @@ export type CreateBackupResponse = [
 export interface CreateBackupOptions {
   databasePath: string;
   expireTime: string | number | p.ITimestamp | PreciseDate;
+  encryptionConfig?: databaseAdmin.spanner.admin.database.v1.ICreateBackupEncryptionConfig;
   gaxOptions?: CallOptions;
 }
 
@@ -119,6 +120,10 @@ class Backup {
    * @property {string} databasePath The database path.
    * @property {string|number|google.protobuf.Timestamp|external:PreciseDate}
    *     expireTime The expire time of the backup.
+   * @property {databaseAdmin.spanner.admin.database.v1.ICreateBackupEncryptionConfig}
+   *     encryptionConfig An encryption configuration describing the
+   *     encryption type and key resources in Cloud KMS to be used to encrypt
+   *     the backup.
    * @property {CallOptions} [gaxOptions] The request configuration options
    *     outlined here:
    *     https://googleapis.github.io/gax-nodejs/classes/CallSettings.html.
@@ -178,6 +183,9 @@ class Backup {
         name: this.formattedName_,
       },
     };
+    if (options.encryptionConfig) {
+      reqOpts.encryptionConfig = options.encryptionConfig;
+    }
     this.request(
       {
         client: 'DatabaseAdminClient',
